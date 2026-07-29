@@ -1,19 +1,19 @@
 # P1Onken.TypeP
 
-**Project**: Type P.
-**Author**: P1OnKen, or パンク派第１音響合成研究班 (Punk Faction, Sound Synthesis Research Unit Number 1).
-**Lead**: Akirako Saint-Just (Cèlia Casanovas).
-**Version**: Type P.b.
-**Start date**: 2026-07-29.
+**Project**: Type P.  
+**Author**: P1OnKen, or パンク派第１音響合成研究班 (Punk Faction, Sound Synthesis Research Unit Number 1).  
+**Lead**: Akirako Saint-Just (Cèlia Casanovas).  
+**Version**: Type P.b.  
+**Start date**: 2026-07-29.  
+  
+P1Onken.TypeP is a digital synthesizer. Its core is an oscillator that reads a sine wave table with a transfer function. It uses this core for phase distortion, phase modulation, granular synthesis and spectral synthesis. All techniques compose with each other.  
+  
+## Version history: Type P.b.  
 
-P1Onken.TypeP is a digital synthesizer. Its core is an oscillator that reads a sine wave table with a transfer function. It uses this core for phase distortion, phase modulation, granular synthesis and spectral synthesis. All techniques compose with each other.
+Type P.a's concept was "Pikopiko Industrial Engine".  
+It had a modular structure with oscillator, modulator and processor slots. The user chose what component each slot contained. This architecture added overhead and made the code complex. **Type P.b seeks a simpler architecture.**  
 
-## Version history: Type P.b.
-
-Type P.a's concept was "Pikopiko Industrial Engine".
-It had a modular structure with oscillator, modulator and processor slots. The user chose what component each slot contained. This architecture added overhead and made the code complex. **Type P.b seeks a simpler architecture.**
-
-We wrote many different components that we thought would fit the concept. As a result, the design became unclear. **Type P.b has a clear-cut concept.**
+We wrote many different components that we thought would fit the concept. As a result, the design became unclear. **Type P.b has a clear-cut concept.**  
 
 ## Inspirations
 
