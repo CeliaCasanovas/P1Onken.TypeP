@@ -1,5 +1,5 @@
 # P1Onken.TypeP
-w**Project**: Type P.  
+**Project**: Type P.  
 **Author**: P1OnKen, or パンク派第１音響合成研究班 (Punk Faction, Sound Synthesis Research Unit Number 1).  
 **Lead**: Akirako Saint-Just (Cèlia Casanovas).  
 **Version**: Type P.b.  
