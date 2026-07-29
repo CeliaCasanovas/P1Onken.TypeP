@@ -12,7 +12,7 @@ P1Onken.TypeP is a digital synthesizer. Its core is an oscillator that reads a s
 Type P.a's concept was "Pikopiko Industrial Engine".  
 It had a modular structure with oscillator, modulator and processor slots. The user chose what component each slot contained. This architecture added overhead and made the code complex. **Type P.b seeks a simpler architecture.**  
 
-For Type P.a, We wrote many different components that we thought would fit the concept. As a result, the design became unclear. **Type P.b has a clear-cut concept.**  
+For Type P.a, we wrote many different components that we thought would fit the concept. As a result, the design became unclear. **Type P.b has a clear-cut concept.**  
 
 ## Inspirations
 
