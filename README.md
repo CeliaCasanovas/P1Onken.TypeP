@@ -5,12 +5,12 @@
 **Version**: Type P.b.
 **Start date**: 2026-07-29.
 
-P1Onken.TypeP is a digital synthesizer. Its core is an oscillator that reads a sine wave table with a transfer function. It uses this core for phase distortion, phase modulation, granular synthesis and spectral synthesis. All techniques compose with each other.
+P1Onken.TypeP is a digital synthesizer. Its core is a cosine oscillator that calculates its phases through a transfer function. It uses this core for phase distortion, phase modulation, granular synthesis and spectral synthesis. All techniques compose with each other.
 
 ## Version history: Type P.b
 
 Type P.a's concept was "Pikopiko Industrial Engine".
-It had a modular structure with oscillator, modulator and processor slots. The user chose what component each slot contained. This architecture added overhead and made the code complex. **Type P.b seeks a simpler architecture.**
+It had a modular structure with oscillator, modulator and processor slots. The user chose what component occupied each slot. This architecture added overhead and made the code complex. **Type P.b seeks a simpler architecture.**
 
 For Type P.a, we wrote many different components that we thought would fit the concept. As a result, the design became unclear. **Type P.b has a clear-cut concept.**
 
