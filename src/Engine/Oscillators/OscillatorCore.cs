@@ -8,12 +8,9 @@ internal static class OscillatorCore
         float currentSample,
         float frequency,
         float sampleRate
-    )
-    {
-        return ((frequency / sampleRate) + currentSample) % 1f;
-    }
+    ) => ((frequency / sampleRate) + currentSample) % 1f;
 
-    internal static float DistortPhase(float rawPhase, TransferFunction transferFunction)
+    internal static float DistortPhase(in float rawPhase, in TransferFunction transferFunction)
     {
         (var d, var v) = transferFunction;
 
@@ -27,26 +24,29 @@ internal static class OscillatorCore
         }
     }
 
-    internal static float DistortPhaseAntialias(float rawPhase, TransferFunction transferFunction)
+    internal static float DistortPhaseAntialias(
+        in float rawPhase,
+        in TransferFunction transferFunction
+    )
     {
         var b = transferFunction.V % 1;
 
         if (b <= 0.5f)
         {
-            return DistortPhase(rawPhase, transferFunction) % 1f / 2f * b;
+            return DistortPhase(in rawPhase, in transferFunction) % 1f / 2f * b;
         }
         else
         {
-            return DistortPhase(rawPhase, transferFunction) % 1f / b;
+            return DistortPhase(in rawPhase, in transferFunction) % 1f / b;
         }
     }
 
-    internal static float ComputeSignal(float distortedPhase) =>
+    internal static float ComputeSignal(in float distortedPhase) =>
         -MathF.Cos(2 * Constants.Pi * distortedPhase);
 
     internal static float ComputeAntialiasedSignal(
-        float antialiasedDistortedPhase,
-        TransferFunction transferFunction
+        in float antialiasedDistortedPhase,
+        in TransferFunction transferFunction
     )
     {
         var b = transferFunction.V % 1f;
@@ -54,23 +54,23 @@ internal static class OscillatorCore
 
         if (b <= 0.5f)
         {
-            return (((1f - c) * ComputeSignal(antialiasedDistortedPhase)) - 1f - c) / 2f;
+            return (((1f - c) * ComputeSignal(in antialiasedDistortedPhase)) - 1f - c) / 2f;
         }
         else if (b > 0.5f && antialiasedDistortedPhase > 0.5f)
         {
-            return (((1f + c) * ComputeSignal(antialiasedDistortedPhase)) - 1f - c) / 2f;
+            return (((1f + c) * ComputeSignal(in antialiasedDistortedPhase)) - 1f - c) / 2f;
         }
         else
         {
-            return ComputeSignal(antialiasedDistortedPhase);
+            return ComputeSignal(in antialiasedDistortedPhase);
         }
     }
 
     internal static TransferFunction LerpTransferFunctionTowardsIdentity(
-        float lerpWeight,
-        TransferFunction transferFunction
+        in float lerpWeight,
+        in TransferFunction transferFunction
     ) =>
-        (
+        new TransferFunction(
             MathF.FusedMultiplyAdd(0.5f - transferFunction.D, lerpWeight, transferFunction.D),
             MathF.FusedMultiplyAdd(0.5f - transferFunction.V, lerpWeight, transferFunction.V)
         );
