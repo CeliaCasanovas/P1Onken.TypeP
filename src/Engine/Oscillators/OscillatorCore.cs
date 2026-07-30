@@ -10,34 +10,46 @@ internal static class OscillatorCore
         float sampleRate
     ) => ((frequency / sampleRate) + currentSample) % 1f;
 
-    internal static float DistortPhase(in float rawPhase, in TransferFunction transferFunction)
+    // calculates phase modulation. comes before phase distortion.
+    internal static float ModulatePhase(in float rawPhase, in float modulatorAmplitude)
     {
-        (var d, var v) = transferFunction;
+        var modulatedPhase = (rawPhase + modulatorAmplitude) % 1f;
+        return modulatedPhase < 0f ? modulatedPhase + 1f : modulatedPhase;
+    }
 
-        if (rawPhase <= d)
+    // calculates phase distortion. comes after phase modulation.
+    internal static float DistortPhase(
+        in float modulatedPhase,
+        in TransferFunction transferFunction
+    )
+    {
+        var (d, v) = transferFunction;
+
+        if (modulatedPhase <= d)
         {
-            return v * rawPhase / d;
+            return (v * modulatedPhase / d) % 1f;
         }
         else
         {
-            return ((1f - v) * (rawPhase - d) * (1f - d)) + v;
+            return (((1f - v) * (modulatedPhase - d) / (1f - d)) + v) % 1f;
         }
     }
 
     internal static float DistortPhaseAntialias(
-        in float rawPhase,
+        in float modulatedPhase,
         in TransferFunction transferFunction
     )
     {
-        var b = transferFunction.V % 1;
+        var b = transferFunction.V % 1f;
+        b = b == 0f ? b : Constants.Epsilon;
 
         if (b <= 0.5f)
         {
-            return DistortPhase(in rawPhase, in transferFunction) % 1f / 2f * b;
+            return DistortPhase(in modulatedPhase, in transferFunction) / (2f * b);
         }
         else
         {
-            return DistortPhase(in rawPhase, in transferFunction) % 1f / b;
+            return DistortPhase(in modulatedPhase, in transferFunction) / b;
         }
     }
 
@@ -70,7 +82,7 @@ internal static class OscillatorCore
         in float lerpWeight,
         in TransferFunction transferFunction
     ) =>
-        new TransferFunction(
+        new(
             MathF.FusedMultiplyAdd(0.5f - transferFunction.D, lerpWeight, transferFunction.D),
             MathF.FusedMultiplyAdd(0.5f - transferFunction.V, lerpWeight, transferFunction.V)
         );
