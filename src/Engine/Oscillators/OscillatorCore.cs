@@ -5,9 +5,9 @@ namespace P1Onken.TypeP.Engine.Oscillators;
 internal static class OscillatorCore
 {
     internal static float ComputeNextRawPhase(
-        float currentSample,
-        float frequency,
-        float sampleRate
+        in float currentSample,
+        in float frequency,
+        in float sampleRate
     ) => ((frequency / sampleRate) + currentSample) % 1f;
 
     // calculates phase modulation. comes before phase distortion.
@@ -41,7 +41,7 @@ internal static class OscillatorCore
     )
     {
         var b = transferFunction.V % 1f;
-        b = b == 0f ? b : Constants.Epsilon;
+        b = b == 0f ? Constants.Epsilon : b;
 
         if (b <= 0.5f)
         {
