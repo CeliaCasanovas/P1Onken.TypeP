@@ -10,6 +10,21 @@ internal struct XenakisGrain
     internal bool Active;
 }
 
+
+// calculating xenakis
+
+// set stochastic grain trigger in motion <- GrainTriggerFrequency (Poisson)
+// distort/modulate transfer phase
+// calculate current band <- GrainCentralBand (Gauss or Logistic)
+// calculate starting phase <- GrainCentralStartingPhase (Gauss or Logistic)
+// calculate length in samples <- GrainLength, GrainPitch
+// apply local distortion to v and d <- GrainTransferFunctionVDistortion, GrainTransferFunctionDDistortion
+// get lengthSamples target phases <- accumulate phase if needed
+// calculate lengthSamples signals
+// scale grain amplitude <- GrainAmplitude
+// apply amplitude window <- GrainWindowSharpness <- GrainPhaseAccumulator/lengthSamples
+// send to mix
+
 // idea for lissajous transferfunction drift
 // float d = Clamp(baseD + dSpread * 0.5f * MathF.Cos(2f*Constants.Pi*omegad*distortedPhase + theta), epsilon, 1f-epsilon);
 // float v = baseV + vSpread * 0.5f * MathF.Cos(2f*Constants.Pi*omegav*distortedPhase);
@@ -18,7 +33,7 @@ internal struct XenakisGrain
 // theta 0, pi/4, pi/2...
 
 // stochastic tf drift for general function
-// float d (or grain brightness) = Clamp01(shapeCenterD + GaussianSample(prng) * shapeSpread);
+// float d (or grain brightness) = Clamp0..1(shapeCenterD + GaussianSample(prng) * shapeSpread);
 // float v (or grain formant) = shapeCenterV + GaussianSample(prng) * shapeSpread * vRangeScale;
 // grain.Tf = new TransferFunction(d, v);
 

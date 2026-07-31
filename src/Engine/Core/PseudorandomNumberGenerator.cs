@@ -1,6 +1,6 @@
 namespace P1Onken.TypeP.Engine.Core;
 
-// xoroshiro128+ based
+// xoroshiro128++ based
 internal struct PseudorandomNumberGenerator
 {
     private ulong _stateVariable1;
@@ -8,7 +8,8 @@ internal struct PseudorandomNumberGenerator
 
     internal PseudorandomNumberGenerator(in uint seed)
     {
-        ulong normalisedSeed = seed == 0 ? 64 : seed + Constants.XoroshiroConstant0;
+        ulong normalisedSeed =
+            seed == 0u ? 64ul + Constants.XoroshiroConstant0 : seed + Constants.XoroshiroConstant0;
         normalisedSeed = (normalisedSeed ^ (normalisedSeed >> 30)) * Constants.XoroshiroConstant1;
         normalisedSeed = (normalisedSeed ^ (normalisedSeed >> 27)) * Constants.XoroshiroConstant2;
         _stateVariable1 = normalisedSeed ^ (normalisedSeed >> 31);
@@ -19,11 +20,14 @@ internal struct PseudorandomNumberGenerator
         _stateVariable2 = normalisedSeed ^ (normalisedSeed >> 31);
     }
 
+    // range is [0f,1f)
     internal float NextSingle()
     {
         ulong localStateVariable1 = _stateVariable1;
         ulong localStateVariable2 = _stateVariable2;
-        ulong result = localStateVariable1 + localStateVariable2;
+        ulong sum = localStateVariable1 + localStateVariable2;
+        ulong rotatedSum = (sum << 17) | (sum >> 47);
+        ulong result = rotatedSum + localStateVariable1;
 
         localStateVariable2 ^= localStateVariable1;
         _stateVariable1 =

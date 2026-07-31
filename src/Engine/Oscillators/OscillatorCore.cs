@@ -36,10 +36,8 @@ internal static class OscillatorCore
         {
             return v * modulatedPhase / d;
         }
-        else
-        {
-            return ((1f - v) * (modulatedPhase - d) / (1f - d)) + v;
-        }
+
+        return ((1f - v) * (modulatedPhase - d) / (1f - d)) + v;
     }
 
     private static float DistortPhaseAntialias(in float distortedPhase, in float b)
@@ -50,10 +48,28 @@ internal static class OscillatorCore
         {
             return distortedPhase % 1f / (2f * normalisedB);
         }
-        else
+
+        return distortedPhase % 1f / normalisedB;
+    }
+
+    private static float ComputeAntialiasedSignal(in float rawDistortedPhase, in float v)
+    {
+        var b = v % 1f;
+        var antialiasedDistortedPhase = DistortPhaseAntialias(rawDistortedPhase, b);
+        var c = MathF.Cos(2f * Constants.Pi * b);
+        var rawAntialiasedSignal = -MathF.Cos(2f * Constants.Pi * antialiasedDistortedPhase);
+
+        if (b <= 0.5f)
         {
-            return distortedPhase % 1f / normalisedB;
+            return (((1f - c) * rawAntialiasedSignal) - 1f - c) / 2f;
         }
+
+        if (b > 0.5f && antialiasedDistortedPhase > 0.5f)
+        {
+            return (((1f + c) * rawAntialiasedSignal) + 1f - c) / 2f;
+        }
+
+        return rawAntialiasedSignal;
     }
 
     internal static float ComputeSignal(
@@ -66,33 +82,24 @@ internal static class OscillatorCore
 
         if (hasAntialias && distortedPhase > MathF.Floor(v))
         {
-            var b = v % 1f;
-            return ComputeAntialiasedSignal(DistortPhaseAntialias(in distortedPhase, in b), in b);
+            return ComputeAntialiasedSignal(in distortedPhase, in v);
         }
-        else
-        {
-            return -MathF.Cos(2f * Constants.Pi * (distortedPhase % 1f));
-        }
+
+        return -MathF.Cos(2f * Constants.Pi * (distortedPhase % 1f));
     }
 
-    private static float ComputeAntialiasedSignal(in float antialiasedDistortedPhase, in float b)
-    {
-        var c = MathF.Cos(2f * Constants.Pi * b);
-        var rawAntialiasedSignal = -MathF.Cos(2f * Constants.Pi * antialiasedDistortedPhase);
-
-        if (b <= 0.5f)
-        {
-            return (((1f - c) * rawAntialiasedSignal) - 1f - c) / 2f;
-        }
-        else if (b > 0.5f && antialiasedDistortedPhase > 0.5f)
-        {
-            return (((1f + c) * rawAntialiasedSignal) + 1f - c) / 2f;
-        }
-        else
-        {
-            return rawAntialiasedSignal;
-        }
-    }
+    // calculating xenakis
+    // set stochastic grain trigger in motion <- GrainTriggerFrequency (Poisson)
+    // distort/modulate transfer phase
+    // calculate current band <- GrainCentralBand (Gauss or Logistic)
+    // calculate starting phase <- GrainCentralStartingPhase (Gauss or Logistic)
+    // calculate length in samples <- GrainLength, GrainPitch
+    // apply local distortion to v and d <- GrainTransferFunctionVDistortion, GrainTransferFunctionDDistortion
+    // get lengthSamples target phases <- accumulate phase if needed
+    // calculate lengthSamples signals
+    // scale grain amplitude <- GrainAmplitude
+    // apply amplitude window <- GrainWindowSharpness <- GrainPhaseAccumulator/lengthSamples
+    // send to mix
 
     internal static TransferFunction LerpTransferFunctionTowardsNoHarmonics(
         in float lerpWeight,

@@ -2,7 +2,7 @@ namespace P1Onken.TypeP.Engine.Core;
 
 internal static class StochasticChaoticGenerator
 {
-    private static PseudorandomNumberGenerator _randomGenerator = new(64);
+    private static PseudorandomNumberGenerator _randomGenerator = new(64u);
 
     internal static float ComputeGaussian(in float mean, in float spread)
     {
@@ -17,27 +17,27 @@ internal static class StochasticChaoticGenerator
     }
 
     // at >87 averageEvents threshold becomes denormal
-    // at >103 averageEvents threshold becomes 0
-    // branching at >50 averageEvents should maintain accuracy well whilst not
+    // at >103 averageEvents threshold becomes 0f
+    // branching at >50 averageEvents should preserve enough accuracy whilst not
     // spending computation on large averageEvents (Gaussian branch is O(1),
-    // Knuth branch calls RandomGenerator.NextSingle() averageEvents times)
-    internal static int ComputePoisson(in int averageEvents)
+    // Knuth branch calls PseudoandomNumberGenerator.NextSingle() averageEvents times)
+    internal static uint ComputePoisson(in uint averageEvents)
     {
-        if (averageEvents <= 0)
+        if (averageEvents <= 0u)
         {
-            return 0;
+            return 0u;
         }
 
-        if (averageEvents > 50)
+        if (averageEvents > 50u)
         {
             float rawNextEventCount = ComputeGaussian(averageEvents, MathF.Sqrt(averageEvents));
-            int roundedNextEventCount = (int)MathF.Round(rawNextEventCount);
-            return Math.Max(roundedNextEventCount, 0);
+            uint roundedNextEventCount = (uint)MathF.Round(rawNextEventCount);
+            return Math.Max(roundedNextEventCount, 0u);
         }
 
         float threshold = MathF.Exp(-averageEvents);
         float probability = 1f;
-        int eventCountAccumulator = 0;
+        uint eventCountAccumulator = 0u;
 
         do
         {
@@ -45,13 +45,13 @@ internal static class StochasticChaoticGenerator
             probability *= _randomGenerator.NextSingle();
         } while (probability > threshold);
 
-        return eventCountAccumulator - 1;
+        return eventCountAccumulator - 1u;
     }
 
     internal static float ComputeNextLogisticMap(in float current, in float chaosAmount)
     {
         float normalisedCurrent = Math.Clamp(current, 0f, 1f);
-        if (normalisedCurrent == 0)
+        if (normalisedCurrent == 0f)
         {
             normalisedCurrent += Constants.Epsilon;
         }

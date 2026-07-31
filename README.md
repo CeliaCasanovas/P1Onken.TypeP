@@ -31,7 +31,7 @@ concept.**
 
 Type P.b was stateful for performance reasons. **Type P.b is an investigation
 into whether a functional-lite, parameter-based data flow can be equally
-efficient.**
+efficient.** It is possible that some mutable state will be unavoidable.
 
 We spent a lot of effort on low-level optimisation for Type P.a. That made the
 code difficult to reason about. **Type P.b defers optimisation to a subsequent
