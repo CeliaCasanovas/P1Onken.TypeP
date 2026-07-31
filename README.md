@@ -1,16 +1,29 @@
 # P1Onken.TypeP
+
 **Project**: Type P.  
-**Author**: P1OnKen, or パンク派第１音響合成研究班 (Punk Faction, Sound Synthesis Research Unit Number 1).  
+**Authors**:
+
+- P1OnKen, or パンク派第１音響合成研究班 (Punk Faction, Sound Synthesis Research
+  Unit Number 1).
+- P1ChouKyouInKen,
+  or パンク派第１超現実主義・共産主義・インダストリアル研究班 (Punk Faction;
+  Surrealist, Communist, and Industrial Research Unit Number 1).
+
 **Lead**: Akirako Saint-Just (Cèlia Casanovas).  
 **Version**: Type P.b.  
-**Start date**: 2026-07-29.  
-  
-P1Onken.TypeP is a digital synthesizer. Its core is an oscillator that reads a sine wave table with a transfer function. It uses this core for phase distortion, phase modulation, granular synthesis and spectral synthesis. All techniques compose with each other.  
-  
-## Version history: Type P.b  
+**Start date**: 2026-07-29.
 
-Type P.a's concept was "Pikopiko Industrial Engine".  
-It had a modular structure with oscillator, modulator and processor slots. The user chose what component each slot contained. This architecture added overhead and made the code complex. **Type P.b seeks a simpler architecture.**  
+P1Onken.TypeP is a digital synthesizer. Its core is a cosine oscillator that
+calculates its phases through a transfer function. It uses this core for phase
+distortion, phase modulation, granular synthesis and spectral synthesis. All
+techniques compose with each other.
+
+## Version history: Type P.b
+
+Type P.a's concept was "Pikopiko Industrial Engine". It had a modular structure
+with oscillator, modulator and processor slots. The user chose what component
+occupied each slot. This architecture added overhead and made the code complex.
+**Type P.b seeks a simpler architecture.**
 
 For Type P.a, we wrote many different components that we thought would fit the
 concept. As a result, the design became unclear. **Type P.b has a clear-cut
@@ -66,4 +79,4 @@ phase, if benchmarks show we need it.**
 - User-friendly operation.
 - High CPU performance with functional-lite idioms.
 - User-friendly stochastic and chaotic sound design and musical composition.
-- A tool for surrealism, communism and the industrial within punk.
+- A tool for punks to explore surrealism, communism and the industrial.
