@@ -2,7 +2,7 @@ namespace P1Onken.TypeP.Engine.Core;
 
 internal static class StochasticChaoticGenerator
 {
-    private static RandomNumberGenerator _randomGenerator = new(64);
+    private static PseudorandomNumberGenerator _randomGenerator = new(64);
 
     internal static float ComputeGaussian(in float mean, in float spread)
     {
