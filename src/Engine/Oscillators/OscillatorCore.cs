@@ -11,9 +11,16 @@ internal static class OscillatorCore
     ) => ((frequency / sampleRate) + currentSample) % 1f;
 
     // calculates phase modulation. comes before phase distortion.
-    internal static float ModulatePhase(in float rawPhase, in float modulatorAmplitude)
+    internal static float ModulatePhase(
+        in float rawPhase,
+        in float modulatorAmplitude,
+        in float feedbackIndex,
+        in float carrierAmplitude
+    )
     {
-        var modulatedPhase = (rawPhase + modulatorAmplitude) % 1f;
+        var modulatedPhase = (rawPhase + modulatorAmplitude);
+        modulatedPhase += carrierAmplitude * feedbackIndex;
+        modulatedPhase %= 1;
         return modulatedPhase < 0f ? modulatedPhase + 1f : modulatedPhase;
     }
 
@@ -27,16 +34,16 @@ internal static class OscillatorCore
 
         if (modulatedPhase <= d)
         {
-            return (v * modulatedPhase / d) % 1f;
+            return (v * modulatedPhase / d);
         }
         else
         {
-            return (((1f - v) * (modulatedPhase - d) / (1f - d)) + v) % 1f;
+            return (((1f - v) * (modulatedPhase - d) / (1f - d)) + v);
         }
     }
 
-    internal static float DistortPhaseAntialias(
-        in float modulatedPhase,
+    private static float DistortPhaseAntialias(
+        in float distortedPhase,
         in TransferFunction transferFunction
     )
     {
@@ -45,18 +52,35 @@ internal static class OscillatorCore
 
         if (b <= 0.5f)
         {
-            return DistortPhase(in modulatedPhase, in transferFunction) / (2f * b);
+            return distortedPhase % 1 / (2f * b);
         }
         else
         {
-            return DistortPhase(in modulatedPhase, in transferFunction) / b;
+            return distortedPhase % 1 / b;
         }
     }
 
-    internal static float ComputeSignal(in float distortedPhase) =>
-        -MathF.Cos(2 * Constants.Pi * distortedPhase);
+    internal static float ComputeSignal(
+        in float distortedPhase,
+        in bool hasAntialias,
+        in TransferFunction transferFunction
+    )
+    {
+        if (hasAntialias && distortedPhase > MathF.Floor(transferFunction.V))
+        {
+            return ComputeAntialiasedSignal(
+                DistortPhaseAntialias(in distortedPhase, in transferFunction),
+                in transferFunction
+            );
+        }
+        else
+        {
+            return -MathF.Cos(2 * Constants.Pi * (distortedPhase % 1));
+        }
+    }
 
-    internal static float ComputeAntialiasedSignal(
+    // needs to be called only when distortedphase BEFORE % 1f > floor(v)
+    private static float ComputeAntialiasedSignal(
         in float antialiasedDistortedPhase,
         in TransferFunction transferFunction
     )
@@ -66,19 +90,21 @@ internal static class OscillatorCore
 
         if (b <= 0.5f)
         {
-            return (((1f - c) * ComputeSignal(in antialiasedDistortedPhase)) - 1f - c) / 2f;
+            return (((1f - c) * -MathF.Cos(2 * Constants.Pi * antialiasedDistortedPhase)) - 1f - c)
+                / 2f;
         }
         else if (b > 0.5f && antialiasedDistortedPhase > 0.5f)
         {
-            return (((1f + c) * ComputeSignal(in antialiasedDistortedPhase)) - 1f - c) / 2f;
+            return (((1f + c) * -MathF.Cos(2 * Constants.Pi * antialiasedDistortedPhase)) + 1f - c)
+                / 2f;
         }
         else
         {
-            return ComputeSignal(in antialiasedDistortedPhase);
+            return -MathF.Cos(2 * Constants.Pi * antialiasedDistortedPhase);
         }
     }
 
-    internal static TransferFunction LerpTransferFunctionTowardsIdentity(
+    internal static TransferFunction LerpTransferFunctionTowardsNoHarmonics(
         in float lerpWeight,
         in TransferFunction transferFunction
     ) =>

@@ -15,7 +15,7 @@ public readonly record struct TransferFunction
 
     public void Deconstruct(out float d, out float v)
     {
-        d = this.D;
-        v = this.V;
+        d = D;
+        v = V;
     }
 }
