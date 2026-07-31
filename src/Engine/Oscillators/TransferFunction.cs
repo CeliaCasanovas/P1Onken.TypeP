@@ -7,7 +7,7 @@ public readonly record struct TransferFunction
     public TransferFunction(float d, float v)
     {
         D = Math.Clamp(d, Constants.Epsilon, 1f - Constants.Epsilon);
-        V = v;
+        V = MathF.Max(v, 0f);
     }
 
     public float D { get; init; }

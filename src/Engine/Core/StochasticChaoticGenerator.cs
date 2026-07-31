@@ -2,12 +2,12 @@ namespace P1Onken.TypeP.Engine.Core;
 
 internal static class StochasticChaoticGenerator
 {
-    private static readonly Random RandomGenerator = new();
+    private static RandomNumberGenerator _randomGenerator = new(64);
 
     internal static float ComputeGaussian(in float mean, in float spread)
     {
-        float uniformVariable1 = 1f - RandomGenerator.NextSingle();
-        float uniformVariable2 = 1f - RandomGenerator.NextSingle();
+        float uniformVariable1 = 1f - _randomGenerator.NextSingle();
+        float uniformVariable2 = 1f - _randomGenerator.NextSingle();
 
         float standardDistribution =
             MathF.Sqrt(-2.0f * MathF.Log(uniformVariable1))
@@ -42,7 +42,7 @@ internal static class StochasticChaoticGenerator
         do
         {
             eventCountAccumulator++;
-            probability *= RandomGenerator.NextSingle();
+            probability *= _randomGenerator.NextSingle();
         } while (probability > threshold);
 
         return eventCountAccumulator - 1;

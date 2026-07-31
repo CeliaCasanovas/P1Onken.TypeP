@@ -20,7 +20,7 @@ internal static class OscillatorCore
     {
         var modulatedPhase = (rawPhase + modulatorAmplitude);
         modulatedPhase += carrierAmplitude * feedbackIndex;
-        modulatedPhase %= 1;
+        modulatedPhase %= 1f;
         return modulatedPhase < 0f ? modulatedPhase + 1f : modulatedPhase;
     }
 
@@ -34,29 +34,25 @@ internal static class OscillatorCore
 
         if (modulatedPhase <= d)
         {
-            return (v * modulatedPhase / d);
+            return v * modulatedPhase / d;
         }
         else
         {
-            return (((1f - v) * (modulatedPhase - d) / (1f - d)) + v);
+            return ((1f - v) * (modulatedPhase - d) / (1f - d)) + v;
         }
     }
 
-    private static float DistortPhaseAntialias(
-        in float distortedPhase,
-        in TransferFunction transferFunction
-    )
+    private static float DistortPhaseAntialias(in float distortedPhase, in float b)
     {
-        var b = transferFunction.V % 1f;
-        b = b == 0f ? Constants.Epsilon : b;
+        var normalisedB = b == 0f ? Constants.Epsilon : b;
 
         if (b <= 0.5f)
         {
-            return distortedPhase % 1 / (2f * b);
+            return distortedPhase % 1f / (2f * normalisedB);
         }
         else
         {
-            return distortedPhase % 1 / b;
+            return distortedPhase % 1f / normalisedB;
         }
     }
 
@@ -66,41 +62,35 @@ internal static class OscillatorCore
         in TransferFunction transferFunction
     )
     {
-        if (hasAntialias && distortedPhase > MathF.Floor(transferFunction.V))
+        var v = transferFunction.V;
+
+        if (hasAntialias && distortedPhase > MathF.Floor(v))
         {
-            return ComputeAntialiasedSignal(
-                DistortPhaseAntialias(in distortedPhase, in transferFunction),
-                in transferFunction
-            );
+            var b = v % 1f;
+            return ComputeAntialiasedSignal(DistortPhaseAntialias(in distortedPhase, in b), in b);
         }
         else
         {
-            return -MathF.Cos(2 * Constants.Pi * (distortedPhase % 1));
+            return -MathF.Cos(2f * Constants.Pi * (distortedPhase % 1f));
         }
     }
 
-    // needs to be called only when distortedphase BEFORE % 1f > floor(v)
-    private static float ComputeAntialiasedSignal(
-        in float antialiasedDistortedPhase,
-        in TransferFunction transferFunction
-    )
+    private static float ComputeAntialiasedSignal(in float antialiasedDistortedPhase, in float b)
     {
-        var b = transferFunction.V % 1f;
         var c = MathF.Cos(2f * Constants.Pi * b);
+        var rawAntialiasedSignal = -MathF.Cos(2f * Constants.Pi * antialiasedDistortedPhase);
 
         if (b <= 0.5f)
         {
-            return (((1f - c) * -MathF.Cos(2 * Constants.Pi * antialiasedDistortedPhase)) - 1f - c)
-                / 2f;
+            return (((1f - c) * rawAntialiasedSignal) - 1f - c) / 2f;
         }
         else if (b > 0.5f && antialiasedDistortedPhase > 0.5f)
         {
-            return (((1f + c) * -MathF.Cos(2 * Constants.Pi * antialiasedDistortedPhase)) + 1f - c)
-                / 2f;
+            return (((1f + c) * rawAntialiasedSignal) + 1f - c) / 2f;
         }
         else
         {
-            return -MathF.Cos(2 * Constants.Pi * antialiasedDistortedPhase);
+            return rawAntialiasedSignal;
         }
     }
 
