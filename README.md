@@ -16,14 +16,44 @@ For Type P.a, we wrote many different components that we thought would fit the c
 
 ## Inspirations
 
-* The Casio CZ, Roland D, Yamaha DX and Kawai K series of synthesizers.
-* Iannis Xenakis' concept of granular synthesis.
-    > In Xenakis' concept, stochastic and chaotic calculations merge sound design and musical composition. **One of the project's goals is a simple, user-friendly implementation of these techniques.**
+- The Casio CZ, Roland D, Yamaha DX and Kawai K series of synthesizers.
+- Iannis Xenakis' concept of granular synthesis.
+  > In Xenakis' concept, stochastic and chaotic calculations merge sound design
+  > and musical composition. **One of the project's goals is a simple,
+  > user-friendly implementation of these techniques.**
+- Kleimola, Lazzarini, Timoney and Välimäki's paper on Vector Phaseshaping
+  Synthesis for DAFx11.
+- Pikopiko, industrial, glitch, punk and avant-garde artists:
+  - Iannis Xenakis
+  - P-Model
+  - Autechre
+  - Orchid
+  - Ampere
+  - Love Lost But Not Forgotten
+  - pageninetynine
+  - The Stalin
+  - Void
+  - Yellow Magic Orchestra
+  - Oval
+  - Wire
+  - Skinny Puppy
+  - Throbbing Gristle
+  - Aunt Sally
+  - Phew
+  - DNA
+  - Black Cat #13
+  - Blow Up
+  - Pan Sonic
+  - Suicide
+  - Karlheinz Stockhausen
+  - Brian Eno
 
 ## Project goals
 
-* Phase Modulation, Phase Distortion, Granular Synthesis and Spectral Synthesis that compose with each other, from a combined transfer function core.
-* Complex signal routing with a simple architecture.
-* User-friendly operation.
-* High CPU performance.
-* Components for user-friendly stochastic and chaotic sound design and musical composition.
+- Phase Modulation, Phase Distortion, Granular Synthesis and Spectral Synthesis
+  that compose with each other, from a combined transfer function core.
+- Complex signal routing with a simple architecture.
+- User-friendly operation.
+- High CPU performance with functional-lite idioms.
+- User-friendly stochastic and chaotic sound design and musical composition.
+- A tool for surrealism, communism and the industrial within punk.
