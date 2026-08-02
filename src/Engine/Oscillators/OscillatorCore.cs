@@ -10,37 +10,43 @@ internal static class OscillatorCore
         in float sampleRate
     ) => ((frequency / sampleRate) + currentSample) % 1f;
 
-    // calculates phase modulation. comes before phase distortion.
-    internal static float ModulatePhase(
-        in float rawPhase,
-        in float modulatorAmplitude,
-        in float feedbackIndex,
-        in float carrierAmplitude
-    )
-    {
-        var modulatedPhase = (rawPhase + modulatorAmplitude);
-        modulatedPhase += carrierAmplitude * feedbackIndex;
-        modulatedPhase %= 1f;
-        return modulatedPhase < 0f ? modulatedPhase + 1f : modulatedPhase;
-    }
-
-    // calculates phase distortion. comes after phase modulation.
-    internal static float DistortPhase(
-        in float modulatedPhase,
-        in TransferFunction transferFunction
-    )
+    internal static float DistortPhase(in float rawPhase, in TransferFunction transferFunction)
     {
         var (d, v) = transferFunction;
 
-        if (modulatedPhase <= d)
+        if (rawPhase <= d)
         {
-            return v * modulatedPhase / d;
+            return v * rawPhase / d;
         }
 
-        return ((1f - v) * (modulatedPhase - d) / (1f - d)) + v;
+        return ((1f - v) * (rawPhase - d) / (1f - d)) + v;
     }
 
-    private static float DistortPhaseAntialias(in float distortedPhase, in float b)
+    private static float ComputePhaseModulation(
+        in float modulationIndex,
+        in float modulatorSignal
+    ) => modulationIndex * modulatorSignal;
+
+    private static float ComputePhaseModuationFeedback(
+        in float previousSignal,
+        in float feedbackFactor
+    ) =>
+        feedbackFactor < 0f
+            ? ComputePhaseModulation(feedbackFactor, MathF.Abs(previousSignal))
+            : ComputePhaseModulation(feedbackFactor, previousSignal);
+
+    internal static float ModulatePhase(
+        in float distortedPhase,
+        in float modulationIndex,
+        in float modulatorSignal,
+        in float previousSignal,
+        in float feedbackFactor
+    ) =>
+        distortedPhase
+        + ComputePhaseModulation(modulationIndex, modulatorSignal)
+        + ComputePhaseModuationFeedback(previousSignal, feedbackFactor);
+
+    private static float AntialiasPhase(in float distortedPhase, in float b)
     {
         var normalisedB = b == 0f ? Constants.Epsilon : b;
 
@@ -52,12 +58,12 @@ internal static class OscillatorCore
         return distortedPhase % 1f / normalisedB;
     }
 
-    private static float ComputeAntialiasedSignal(in float rawDistortedPhase, in float v)
+    private static float ComputeAntialiasedSignal(in float rawDistortedModulatedPhase, in float v)
     {
         var b = v % 1f;
-        var antialiasedDistortedPhase = DistortPhaseAntialias(rawDistortedPhase, b);
-        var c = MathF.Cos(2f * Constants.Pi * b);
-        var rawAntialiasedSignal = -MathF.Cos(2f * Constants.Pi * antialiasedDistortedPhase);
+        var antialiasedDistortedPhase = AntialiasPhase(rawDistortedModulatedPhase, b);
+        var c = MathF.Cos(b.ToRadians());
+        var rawAntialiasedSignal = -MathF.Cos(antialiasedDistortedPhase.ToRadians());
 
         if (b <= 0.5f)
         {
@@ -73,19 +79,41 @@ internal static class OscillatorCore
     }
 
     internal static float ComputeSignal(
-        in float distortedPhase,
+        in float distortedModulatedPhase,
         in bool hasAntialias,
         in TransferFunction transferFunction
     )
     {
         var v = transferFunction.V;
 
-        if (hasAntialias && distortedPhase > MathF.Floor(v))
+        if (hasAntialias && distortedModulatedPhase > MathF.Floor(v))
         {
-            return ComputeAntialiasedSignal(in distortedPhase, in v);
+            return ComputeAntialiasedSignal(in distortedModulatedPhase, in v);
         }
 
-        return -MathF.Cos(2f * Constants.Pi * (distortedPhase % 1f));
+        return -MathF.Cos((distortedModulatedPhase % 1f).ToRadians());
+    }
+
+    // wavefolder
+    // fractalFactor > 0f
+    // feedbackFactor
+    internal static float ComputeFractalFeedbackSignal(
+        float phase,
+        float fractalFactor,
+        float feedbackFactor
+    )
+    {
+        while (feedbackFactor >= Constants.Epsilon)
+        {
+            phase += feedbackFactor * -MathF.Cos((phase % 1f).ToRadians());
+
+            float currentFractal = fractalFactor;
+
+            fractalFactor = currentFractal * currentFractal;
+            feedbackFactor = currentFractal * feedbackFactor;
+        }
+
+        return -MathF.Cos((phase % 1f).ToRadians());
     }
 
     // calculating xenakis
