@@ -44,11 +44,9 @@ internal static class OscillatorCore
         + ComputePhaseModulation(modulationIndex, modulatorSignal)
         + ComputePhaseModulationFeedback(previousSignal, feedbackFactor);
 
-    internal static float ComputeSignal(
-        float distortedModulatedPhase,
-    )
+    internal static float ComputeSignal(float phase)
     {
-        return -MathF.Cos(distortedModulatedPhase % 1f.ToRadians());
+        return -MathF.Cos(phase % 1f.ToRadians());
     }
 
     // calculating xenakis
@@ -64,13 +62,9 @@ internal static class OscillatorCore
     // apply amplitude window <- GrainWindowSharpness <- GrainPhaseAccumulator/lengthSamples
     // send to mix
 
-    // this is very likely not the ideal way to do this
-    internal static TransferFunction LerpTransferFunctionTowardsNoHarmonics(
-        float lerpWeight,
-        in TransferFunction transferFunction
-    ) =>
-        new(
-            MathF.FusedMultiplyAdd(0.5f - transferFunction.D, lerpWeight, transferFunction.D),
-            MathF.FusedMultiplyAdd(0.5f - transferFunction.V, lerpWeight, transferFunction.V)
-        );
+    internal static float LerpRawPhaseTowardsDistortedPhase(
+        float rawPhase,
+        float distortedModulatedPhase,
+        float harmonicsWeight
+    ) => MathF.FusedMultiplyAdd(harmonicsWeight, distortedModulatedPhase - rawPhase, rawPhase);
 }
