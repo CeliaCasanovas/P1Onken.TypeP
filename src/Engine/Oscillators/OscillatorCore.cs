@@ -46,11 +46,8 @@ internal static class OscillatorCore
 
     internal static float ComputeSignal(
         float distortedModulatedPhase,
-        in TransferFunction transferFunction
     )
     {
-        var v = transferFunction.V;
-
         return -MathF.Cos(distortedModulatedPhase % 1f.ToRadians());
     }
 
