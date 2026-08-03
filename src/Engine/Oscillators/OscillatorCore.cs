@@ -44,7 +44,8 @@ internal static class OscillatorCore
         + ComputePhaseModulation(modulationIndex, modulatorSignal)
         + ComputePhaseModulationFeedback(previousSignal, feedbackFactor);
 
-    internal static float ComputeSignal(float phase)
+    // probably needs to become a Core helper, also for modulators
+    private static float ComputeSignal(float phase)
     {
         return -MathF.Cos(phase % 1f.ToRadians());
     }
@@ -67,4 +68,32 @@ internal static class OscillatorCore
         float distortedModulatedPhase,
         float harmonicsWeight
     ) => MathF.FusedMultiplyAdd(harmonicsWeight, distortedModulatedPhase - rawPhase, rawPhase);
+
+    // work in progress: config structs need to be defined
+    // partconfig, oscillatorconfig, spectralconfig, phasemodulationconfig, xenakisconfig, modulationconfig?
+    // should these be bundled in a single object, statically allocated for every oscillator?
+    // write frequency calculation helper (part frequency * multiplier)
+    // pipeline
+    // modulate part config
+    // modulate oscillator config <- should it include phase modulation sources? or should those be a separate struct
+    // get raw phase
+    // distort phase
+    // modulate phase
+    // lerp if harmonicsWeight > 0f, < 1f
+    // compute signal
+    // modulate Xenakis config <- should it be separate from oscillator config?
+    // compute Xenakis signal
+    // return mix of xenakis signal and pdpm signal
+    //
+    // internal static float ComputeOscillatorSignal(
+    //  in PartConfig partConfig,
+    //  in OscillatorConfig oscillatorConfig,
+    //  in SpectralConfig spectralConfig,
+    //  in PhaseModulationConfig phaseModulationConfig,
+    //  in XenakisConfig xenakisConfig
+    //  in ModulationConfig modulationConfig,
+    //  float currentSample)
+    // {
+    //     float rawPhase = ComputeNextRawPhase()
+    // }
 }
