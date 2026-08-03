@@ -44,74 +44,14 @@ internal static class OscillatorCore
         + ComputePhaseModulation(modulationIndex, modulatorSignal)
         + ComputePhaseModulationFeedback(previousSignal, feedbackFactor);
 
-    private static float AntialiasPhase(float distortedPhase, float b)
-    {
-        var normalisedB = b == 0f ? Constants.Epsilon : b;
-
-        if (b <= 0.5f)
-        {
-            return distortedPhase % 1f / (2f * normalisedB);
-        }
-
-        return distortedPhase % 1f / normalisedB;
-    }
-
-    private static float ComputeAntialiasedSignal(float rawDistortedModulatedPhase, float v)
-    {
-        var b = v % 1f;
-        var antialiasedDistortedPhase = AntialiasPhase(rawDistortedModulatedPhase, b);
-        var c = MathF.Cos(b.ToRadians());
-        var rawAntialiasedSignal = -MathF.Cos(antialiasedDistortedPhase.ToRadians());
-
-        if (b <= 0.5f)
-        {
-            return (((1f - c) * rawAntialiasedSignal) - 1f - c) / 2f;
-        }
-
-        if (b > 0.5f && antialiasedDistortedPhase > Constants.Pi)
-        {
-            return (((1f + c) * rawAntialiasedSignal) + 1f - c) / 2f;
-        }
-
-        return rawAntialiasedSignal;
-    }
-
     internal static float ComputeSignal(
         float distortedModulatedPhase,
-        bool hasAntialias,
         in TransferFunction transferFunction
     )
     {
         var v = transferFunction.V;
 
-        if (hasAntialias && distortedModulatedPhase > MathF.Floor(v))
-        {
-            return ComputeAntialiasedSignal(distortedModulatedPhase, v);
-        }
-
         return -MathF.Cos(distortedModulatedPhase % 1f.ToRadians());
-    }
-
-    // wavefolder
-    // fractalFactor > 0f
-    // feedbackFactor
-    internal static float ComputeFractalFeedbackSignal(
-        float phase,
-        float fractalFactor,
-        float feedbackFactor
-    )
-    {
-        while (feedbackFactor >= Constants.Epsilon)
-        {
-            phase += Constants.Pi * 0.5f * feedbackFactor * -MathF.Cos(phase % 1f.ToRadians());
-
-            float currentFractal = fractalFactor;
-
-            fractalFactor = currentFractal * currentFractal;
-            feedbackFactor = currentFractal * feedbackFactor;
-        }
-
-        return -MathF.Cos(phase % 1f.ToRadians());
     }
 
     // calculating xenakis
