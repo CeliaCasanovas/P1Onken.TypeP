@@ -3,10 +3,12 @@ namespace P1Onken.TypeP.Engine.Core;
 // xoroshiro128++ based
 internal struct PseudorandomNumberGenerator
 {
+    // it's ok for something meant to be random, i.e. non-deterministic from the outside,
+    // to be stateful as long as nothing crucial depends on that state outside the PRNG
     private ulong _stateVariable1;
     private ulong _stateVariable2;
 
-    internal PseudorandomNumberGenerator(in uint seed)
+    internal PseudorandomNumberGenerator(uint seed)
     {
         ulong normalisedSeed =
             seed == 0u ? 64ul + Constants.XoroshiroConstant0 : seed + Constants.XoroshiroConstant0;

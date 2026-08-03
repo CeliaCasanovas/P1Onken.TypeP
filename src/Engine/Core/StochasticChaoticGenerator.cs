@@ -4,7 +4,7 @@ internal static class StochasticChaoticGenerator
 {
     private static PseudorandomNumberGenerator _randomGenerator = new(64u);
 
-    internal static float ComputeGaussian(in float mean, in float spread)
+    internal static float ComputeGaussian(float mean, float spread)
     {
         float uniformVariable1 = 1f - _randomGenerator.NextSingle();
         float uniformVariable2 = 1f - _randomGenerator.NextSingle();
@@ -21,7 +21,7 @@ internal static class StochasticChaoticGenerator
     // branching at >50 averageEvents should preserve enough accuracy whilst not
     // spending computation on large averageEvents (Gaussian branch is O(1),
     // Knuth branch calls PseudoandomNumberGenerator.NextSingle() averageEvents times)
-    internal static uint ComputePoisson(in uint averageEvents)
+    internal static uint ComputePoisson(uint averageEvents)
     {
         if (averageEvents <= 0u)
         {
@@ -48,13 +48,12 @@ internal static class StochasticChaoticGenerator
         return eventCountAccumulator - 1u;
     }
 
-    internal static float ComputeNextLogisticMap(in float current, in float chaosAmount)
+    internal static float ComputeNextLogisticMap(float current, float chaosAmount)
     {
-        float normalisedCurrent = Math.Clamp(current, 0f, 1f);
-        if (normalisedCurrent == 0f)
-        {
-            normalisedCurrent += Constants.Epsilon;
-        }
-        return normalisedCurrent * chaosAmount * (1f - normalisedCurrent);
+        float normalisedCurrent = Math.Clamp(current, Constants.Epsilon, 1f);
+        // move chaosAmount normalisation to config struct setter
+        float normalisedChaos = Math.Clamp(chaosAmount, Constants.Epsilon, 4f);
+
+        return normalisedCurrent * normalisedChaos * (1f - normalisedCurrent);
     }
 }

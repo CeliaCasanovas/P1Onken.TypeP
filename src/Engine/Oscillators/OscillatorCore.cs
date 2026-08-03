@@ -5,12 +5,12 @@ namespace P1Onken.TypeP.Engine.Oscillators;
 internal static class OscillatorCore
 {
     internal static float ComputeNextRawPhase(
-        in float currentSample,
-        in float frequency,
-        in float sampleRate
+        float currentSample,
+        float frequency,
+        float sampleRate
     ) => ((frequency / sampleRate) + currentSample) % 1f;
 
-    internal static float DistortPhase(in float rawPhase, in TransferFunction transferFunction)
+    internal static float DistortPhase(float rawPhase, in TransferFunction transferFunction)
     {
         var (d, v) = transferFunction;
 
@@ -22,31 +22,29 @@ internal static class OscillatorCore
         return ((1f - v) * (rawPhase - d) / (1f - d)) + v;
     }
 
-    private static float ComputePhaseModulation(
-        in float modulationIndex,
-        in float modulatorSignal
-    ) => modulationIndex * modulatorSignal;
+    private static float ComputePhaseModulation(float modulationIndex, float modulatorSignal) =>
+        Constants.Pi * 0.5f * modulationIndex * modulatorSignal;
 
-    private static float ComputePhaseModuationFeedback(
-        in float previousSignal,
-        in float feedbackFactor
+    private static float ComputePhaseModulationFeedback(
+        float previousSignal,
+        float feedbackFactor
     ) =>
         feedbackFactor < 0f
             ? ComputePhaseModulation(feedbackFactor, MathF.Abs(previousSignal))
             : ComputePhaseModulation(feedbackFactor, previousSignal);
 
     internal static float ModulatePhase(
-        in float distortedPhase,
-        in float modulationIndex,
-        in float modulatorSignal,
-        in float previousSignal,
-        in float feedbackFactor
+        float distortedPhase,
+        float modulationIndex,
+        float modulatorSignal,
+        float previousSignal,
+        float feedbackFactor
     ) =>
-        distortedPhase
+        distortedPhase.ToRadians()
         + ComputePhaseModulation(modulationIndex, modulatorSignal)
-        + ComputePhaseModuationFeedback(previousSignal, feedbackFactor);
+        + ComputePhaseModulationFeedback(previousSignal, feedbackFactor);
 
-    private static float AntialiasPhase(in float distortedPhase, in float b)
+    private static float AntialiasPhase(float distortedPhase, float b)
     {
         var normalisedB = b == 0f ? Constants.Epsilon : b;
 
@@ -58,7 +56,7 @@ internal static class OscillatorCore
         return distortedPhase % 1f / normalisedB;
     }
 
-    private static float ComputeAntialiasedSignal(in float rawDistortedModulatedPhase, in float v)
+    private static float ComputeAntialiasedSignal(float rawDistortedModulatedPhase, float v)
     {
         var b = v % 1f;
         var antialiasedDistortedPhase = AntialiasPhase(rawDistortedModulatedPhase, b);
@@ -70,7 +68,7 @@ internal static class OscillatorCore
             return (((1f - c) * rawAntialiasedSignal) - 1f - c) / 2f;
         }
 
-        if (b > 0.5f && antialiasedDistortedPhase > 0.5f)
+        if (b > 0.5f && antialiasedDistortedPhase > Constants.Pi)
         {
             return (((1f + c) * rawAntialiasedSignal) + 1f - c) / 2f;
         }
@@ -79,8 +77,8 @@ internal static class OscillatorCore
     }
 
     internal static float ComputeSignal(
-        in float distortedModulatedPhase,
-        in bool hasAntialias,
+        float distortedModulatedPhase,
+        bool hasAntialias,
         in TransferFunction transferFunction
     )
     {
@@ -88,10 +86,10 @@ internal static class OscillatorCore
 
         if (hasAntialias && distortedModulatedPhase > MathF.Floor(v))
         {
-            return ComputeAntialiasedSignal(in distortedModulatedPhase, in v);
+            return ComputeAntialiasedSignal(distortedModulatedPhase, v);
         }
 
-        return -MathF.Cos((distortedModulatedPhase % 1f).ToRadians());
+        return -MathF.Cos(distortedModulatedPhase % 1f.ToRadians());
     }
 
     // wavefolder
@@ -105,7 +103,7 @@ internal static class OscillatorCore
     {
         while (feedbackFactor >= Constants.Epsilon)
         {
-            phase += feedbackFactor * -MathF.Cos((phase % 1f).ToRadians());
+            phase += Constants.Pi * 0.5f * feedbackFactor * -MathF.Cos(phase % 1f.ToRadians());
 
             float currentFractal = fractalFactor;
 
@@ -113,7 +111,7 @@ internal static class OscillatorCore
             feedbackFactor = currentFractal * feedbackFactor;
         }
 
-        return -MathF.Cos((phase % 1f).ToRadians());
+        return -MathF.Cos(phase % 1f.ToRadians());
     }
 
     // calculating xenakis
@@ -129,8 +127,9 @@ internal static class OscillatorCore
     // apply amplitude window <- GrainWindowSharpness <- GrainPhaseAccumulator/lengthSamples
     // send to mix
 
+    // this is very likely not the ideal way to do this
     internal static TransferFunction LerpTransferFunctionTowardsNoHarmonics(
-        in float lerpWeight,
+        float lerpWeight,
         in TransferFunction transferFunction
     ) =>
         new(
