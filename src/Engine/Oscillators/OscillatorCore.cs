@@ -45,6 +45,7 @@ internal static class OscillatorCore
         + ComputePhaseModulationFeedback(previousSignal, feedbackFactor);
 
     // probably needs to become a Core helper, also for modulators
+    // if not, it can be folded into the oscillator pipeline
     private static float ComputeSignal(float phase)
     {
         return -MathF.Cos(phase % 1f.ToRadians());
