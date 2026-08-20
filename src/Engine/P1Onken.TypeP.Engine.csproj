@@ -18,4 +18,7 @@
     <TieredCompilation>true</TieredCompilation>
     <TieredPGO>true</TieredPGO>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Numerics.Tensors" Version="10.0.11" />
+  </ItemGroup>
 </Project>
