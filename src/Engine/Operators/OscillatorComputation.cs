@@ -1,16 +1,16 @@
 using P1Onken.TypeP.Engine.Core;
 
-namespace P1Onken.TypeP.Engine.Oscillators;
+namespace P1Onken.TypeP.Engine.Operators;
 
-internal static class OscillatorCore
+internal static class OscillatorComputation
 {
     internal static float ComputeNextRawPhase(
-        float currentSample,
+        float currentPhase,
         float frequency,
         float sampleRate
-    ) => ((frequency / sampleRate) + currentSample) % 1f;
+    ) => ((frequency / sampleRate) + currentPhase) % 1f;
 
-    internal static float DistortPhase(float rawPhase, in TransferFunction transferFunction)
+    internal static float DistortPhase(float rawPhase, TransferFunction transferFunction)
     {
         var (d, v) = transferFunction;
 
@@ -40,15 +40,17 @@ internal static class OscillatorCore
         float previousSignal,
         float feedbackFactor
     ) =>
-        distortedPhase.ToRadians()
-        + ComputePhaseModulation(modulationIndex, modulatorSignal)
-        + ComputePhaseModulationFeedback(previousSignal, feedbackFactor);
+        (
+            distortedPhase
+            + ComputePhaseModulation(modulationIndex, modulatorSignal)
+            + ComputePhaseModulationFeedback(previousSignal, feedbackFactor)
+        ) % 1f;
 
     // probably needs to become a Core helper, also for modulators
     // if not, it can be folded into the oscillator pipeline
-    private static float ComputeSignal(float phase)
+    internal static float ComputeSignal(float phase)
     {
-        return -MathF.Cos(phase % 1f.ToRadians());
+        return Maths.FastMinusCos(phase);
     }
 
     // calculating xenakis

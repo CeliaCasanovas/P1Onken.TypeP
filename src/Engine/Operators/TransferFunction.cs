@@ -1,8 +1,8 @@
 using P1Onken.TypeP.Engine.Core;
 
-namespace P1Onken.TypeP.Engine.Oscillators;
+namespace P1Onken.TypeP.Engine.Operators;
 
-public readonly record struct TransferFunction
+public record struct TransferFunction
 {
     public TransferFunction(float d, float v)
     {
@@ -10,10 +10,10 @@ public readonly record struct TransferFunction
         V = MathF.Max(v, 0f);
     }
 
-    public float D { get; init; }
-    public float V { get; init; }
+    public float D { get; set; }
+    public float V { get; set; }
 
-    public void Deconstruct(out float d, out float v)
+    public readonly void Deconstruct(out float d, out float v)
     {
         d = D;
         v = V;

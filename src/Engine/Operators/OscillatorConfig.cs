@@ -1,4 +1,4 @@
-namespace P1Onken.TypeP.Engine.Oscillators;
+namespace P1Onken.TypeP.Engine.Operators;
 
 internal struct OscillatorConfig
 {

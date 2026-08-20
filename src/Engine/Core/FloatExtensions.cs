@@ -4,6 +4,6 @@ internal static class FloatExtensions
 {
     extension(float f)
     {
-        internal float ToRadians() => 2f * Constants.Pi * f;
+        internal float ToRadians() => Constants.TwoPi * f;
     }
 }
