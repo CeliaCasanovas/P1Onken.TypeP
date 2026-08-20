@@ -1,4 +1,4 @@
-namespace P1Onken.TypeP.Engine.Operators;
+namespace P1Onken.TypeP.Engine.Operators.Envelopes;
 
 internal enum EnvelopeStage
 {

@@ -2,10 +2,10 @@ namespace P1Onken.TypeP.Engine.Operators;
 
 internal struct XenakisGrain
 {
-    internal float CarrierPhase; // stochastic start, then accumulates normally
-    internal float WindowPhase; // 0..1, tracks duration, unrelated to CarrierPhase
-    internal float Frequency; // centerFreq × 2^(pitchOffset/12)
-    internal float DurationSamples;
+    internal float BasePhase;
+    internal float WindowPhase; // 0..1, tracks duration, unrelated to BasePhase
+    internal float Frequency; // GrainPitch * 2^(pitchOffset/12)
+    internal int DurationSamples;
     internal float Amplitude;
     internal bool Active;
 }

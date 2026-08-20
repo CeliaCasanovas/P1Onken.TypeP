@@ -107,6 +107,7 @@ internal static class OscillatorComputationTensor
     )
     {
         // cos(-x) = cos x, so using -2pi for this FMA trick works
+        // signals is acting as a scratch buffer here, and it represents the normalised phases
         TensorPrimitives.Multiply(phases, 1f / Constants.TwoPi, signals);
         TensorPrimitives.Floor(signals, signals);
         TensorPrimitives.FusedMultiplyAdd(signals, -Constants.TwoPi, phases, signals);

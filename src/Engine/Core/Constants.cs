@@ -11,6 +11,7 @@ internal static class Constants
     internal const float Ln10000 = 9.2103403f;
     internal const float SampleRate = 96000f;
     internal const int SampleRateMs = (int)SampleRate / 1000;
+    internal const float SampleRateSquared = 9216000000f;
     internal const float Log2E = 1.44269504f;
     internal const float MineiroA = 121.2740575f;
     internal const float MineiroB = 27.7280233f;

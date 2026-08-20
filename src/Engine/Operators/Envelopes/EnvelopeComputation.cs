@@ -1,20 +1,30 @@
 using P1Onken.TypeP.Engine.Core;
 
-namespace P1Onken.TypeP.Engine.Operators;
+namespace P1Onken.TypeP.Engine.Operators.Envelopes;
 
 internal static unsafe class EnvelopeComputation
 {
-    // pass just currentAmplitude and EnvelopeConfig into the computations
-    private static delegate* <float, int, EnvelopeConfig>[] Computations;
+    internal static readonly delegate* <float, DahddrEnvelope, EnvelopeStage, float>[] Computations;
 
-    // riseTime is in ms
-    private static float ComputeSigmoidFactor(int samples)
+    static EnvelopeComputation()
+    {
+        Computations =
+        [
+            &ComputeNextAmplitudeHold,
+            &ComputeNextAmplitudeRise,
+            &ComputeNextAmplitudeHold,
+            &ComputeNextAmplitudeFall,
+            &ComputeNextAmplitudeFall,
+            &ComputeNextAmplitudeFall,
+        ];
+    }
+
+    internal static float ComputeSigmoidFactor(float samples)
     {
         return Maths.FastExp(2f * Constants.Ln10000 / samples);
     }
 
-    // fallTime is in ms
-    private static float ComputeExponentialFactor(int samples)
+    internal static float ComputeExponentialFactor(float samples)
     {
         return 1f - Maths.FastExp(-Constants.Ln10000 / samples);
     }
@@ -23,13 +33,13 @@ internal static unsafe class EnvelopeComputation
     // curve = 1f is fully pseudo-sigmoid
     internal static float ComputeNextAmplitudeRise(
         float currentAmplitude,
-        EnvelopeConfig config,
+        DahddrEnvelope envelope,
         EnvelopeStage stage
     )
     {
-        var exponentialFactor = config[stage].ExponentialFactor;
-        var sigmoidFactor = config.AttackSigmoidFactor;
-        var curve = config.AttackCurve;
+        var exponentialFactor = envelope[stage].ExponentialFactor;
+        var sigmoidFactor = envelope.AttackSigmoidFactor;
+        var curve = envelope.AttackCurve;
 
         float distance = 1f - currentAmplitude;
 
@@ -53,12 +63,12 @@ internal static unsafe class EnvelopeComputation
 
     internal static float ComputeNextAmplitudeFall(
         float currentAmplitude,
-        EnvelopeConfig config,
+        DahddrEnvelope envelope,
         EnvelopeStage stage
     )
     {
-        var targetLevel = config[stage].TargetLevel;
-        var exponentialFactor = config[stage].ExponentialFactor;
+        var targetLevel = envelope[stage].TargetLevel;
+        var exponentialFactor = envelope[stage].ExponentialFactor;
 
         if (currentAmplitude <= targetLevel)
         {
@@ -75,5 +85,12 @@ internal static unsafe class EnvelopeComputation
         );
     }
 
-    internal static float ComputeNextAmplitudeHold(float currentAmplitude) => currentAmplitude;
+    internal static float ComputeNextAmplitudeHold(
+        float currentAmplitude,
+        DahddrEnvelope envelope,
+        EnvelopeStage stage
+    ) => currentAmplitude;
+
+    internal static float ComputeStep(float stageLengthSamples) =>
+        Constants.SampleRateSquared / stageLengthSamples;
 }

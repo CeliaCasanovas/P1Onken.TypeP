@@ -1,4 +1,3 @@
-using System.Net.Security;
 using System.Numerics.Tensors;
 
 namespace P1Onken.TypeP.Engine.Core;
@@ -42,7 +41,7 @@ internal static class Maths
     // -cos(x) = c0 + (x^2)(c2 + (x^2)(c4 + (x^2)c6))
     internal static float FastMinusCos(float x)
     {
-        x = MathF.FusedMultiplyAdd(x, Constants.TwoPi, Constants.Pi);
+        x = MathF.FusedMultiplyAdd(x, Constants.TwoPi, -Constants.Pi);
         float xSquared = x * x;
 
         float scratchBuffer = MathF.FusedMultiplyAdd(
@@ -62,10 +61,11 @@ internal static class Maths
         );
     }
 
+    // x [0,2pi]
     internal static Span<float> FastMinusCosTensor(Span<float> xs, Span<float> scratchBuffer)
     {
-        TensorPrimitives.Subtract(xs, Constants.Pi, xs);
-        TensorPrimitives.Multiply(xs, xs, xs);
+        // scaling x to [-pi, pi] and squaring it at the same time
+        TensorPrimitives.FusedMultiplyAdd(xs, xs, -Constants.Pi, xs);
 
         TensorPrimitives.FusedMultiplyAdd(
             xs,
