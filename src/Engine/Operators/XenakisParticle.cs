@@ -1,13 +1,14 @@
 namespace P1Onken.TypeP.Engine.Operators;
 
-internal struct XenakisGrain
+internal struct XenakisParticle
 {
-    internal float BasePhase;
-    internal float WindowPhase; // 0..1, tracks duration, unrelated to BasePhase
+    internal float StartingPhase;
+    internal float SampleAccumulator;
     internal float Frequency; // GrainPitch * 2^(pitchOffset/12)
-    internal int DurationSamples;
-    internal float Amplitude;
-    internal bool Active;
+    internal float DurationSamples;
+    internal float AmplitudeMultiplier;
+    internal float WindowShape;
+    internal bool IsActive;
 }
 
 

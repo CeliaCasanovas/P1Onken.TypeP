@@ -10,13 +10,13 @@ internal static class Constants
     // 10000 = 1 / Epsilon
     internal const float Ln10000 = 9.2103403f;
     internal const float SampleRate = 96000f;
-    internal const int SampleRateMs = (int)SampleRate / 1000;
+    internal const float SampleRateMs = SampleRate / 1000f;
     internal const float SampleRateSquared = 9216000000f;
     internal const float Log2E = 1.44269504f;
-    internal const float MineiroA = 121.2740575f;
-    internal const float MineiroB = 27.7280233f;
-    internal const float MineiroC = 4.84252568f;
-    internal const float MineiroD = 1.49012907f;
+    internal const float MineiroConstant0 = 121.2740575f;
+    internal const float MineiroConstant1 = 27.7280233f;
+    internal const float MineiroConstant2 = 4.84252568f;
+    internal const float MineiroConstant3 = 1.49012907f;
 
     // internal const float SchraudolphMultiplier = 12102203f; // 2^23 / ln(2)
     // internal const float SchraudolphCorrection = 1064866805f; // 127*2^23 - 486411

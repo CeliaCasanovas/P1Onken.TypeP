@@ -27,9 +27,9 @@ internal static class Maths
             (1 << 23)
             * (
                 exponent
-                + Constants.MineiroA
-                + Constants.MineiroB / (Constants.MineiroC - mantissa)
-                - Constants.MineiroD * mantissa
+                + Constants.MineiroConstant0
+                + Constants.MineiroConstant1 / (Constants.MineiroConstant2 - mantissa)
+                - Constants.MineiroConstant3 * mantissa
             )
         );
 
